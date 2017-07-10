@@ -1,0 +1,30 @@
+#spark Transformations
+-- Store the data in hdfs 
+-- For the below example using retail_db example only which we have seen in hive and sqoop, and have to provide HDFS location
+-- Give the path of the retail_db location in HDFS, open spark-shell, master yarn, deploy-mode in client
+
+val path= "/user/hive/warehouse/retail_db"
+-- Data is stored in HDFS location when imported by sqoop as a text file, fields seperated by comma and lines seperated by new line.
+val rdd = sc.textFile(path + "/orders")
+
+-- Gives the first row in the text file, paranthesis are optional in Scala if there are no parameters to pass
+rdd.first() or rdd.first  
+res0: String = 1,2013-07-25 00:00:00.0,11599,CLOSED
+
+-- take method on a rdd retuns an Array
+scala> rdd.take(10)
+res2: Array[String] = Array(1,2013-07-25 00:00:00.0,11599,CLOSED, 2,2013-07-25 00:00:00.0,256,PENDING_PAYMENT, 3,2013-07-25 00:00:00.0,12111,COMPLETE, 4,2013-07-25 00:00:00.0,8827,CLOSED, 5,2013-07-25 00:00:00.0,11318,COMPLETE, 6,2013-07-25 00:00:00.0,7130,COMPLETE, 7,2013-07-25 00:00:00.0,4530,COMPLETE, 8,2013-07-25 00:00:00.0,2911,PROCESSING, 9,2013-07-25 00:00:00.0,5657,PENDING_PAYMENT, 10,2013-07-25 00:00:00.0,5648,PENDING_PAYMENT)
+
+rdd.take(10).foreach(println)
+-- Using take and foreach and println methods together, using tab won't give the methods
+scala> rdd.take(10).foreach(k=> println(k.split(",")(0)+"\t"+k.split(",")(3)))
+1       CLOSED
+2       PENDING_PAYMENT
+3       COMPLETE
+4       CLOSED
+5       COMPLETE
+6       COMPLETE
+7       COMPLETE
+8       PROCESSING
+9       PENDING_PAYMENT
+10      PENDING_PAYMENT
