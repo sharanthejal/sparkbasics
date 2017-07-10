@@ -1,0 +1,8 @@
+#Run Spark shell in yarn-client mode
+-- Run this command anywhere in the machine, currently tried in cloudera distribution
+sudo -uhdfs spark-shell \
+	--master yarn \
+    --deploy-mode client \
+    --driver-memory 512m \
+    --executor-memory 256m \
+    --executor-cores 2 
