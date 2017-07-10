@@ -1,0 +1,21 @@
+#Spark Transformations
+#Row Level Transformations
+
+Discarding or Flitering out unnecessary Data
+-- filter function, it takes one record as input and if the expression is false the record will be discarded
+
+val path= "/user/hive/warehouse/retail_db"
+val rdd = sc.textFile(path + "/orders")
+scala> rdd.first
+res8: String = 1,2013-07-25 00:00:00.0,11599,CLOSED
+
+-- Requirement: Find the completed orders from the orders text file
+val compltedOrders= rdd.filter(order=> order.split(",")(3)=="COMPLETE")
+
+scala> compltedOrders.count
+res10: Long = 22899
+
+scala> rdd.count
+res13: Long = 68883
+
+-- Out of 68883 orders 22899 orders are completed ones.
