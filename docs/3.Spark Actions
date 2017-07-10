@@ -1,0 +1,21 @@
+
+#Spark Actions
+
+-- Return the first n elements of the RDD using either their natural order or a custom comparator.
+-- takeOrdered function, one can do reverse ordering and custom ordering of collections in spark
+
+-- Here reverse ordering is done based on the 3rd field
+scala> rdd.takeOrdered(5)(Ordering[Int].reverse.on(k=> k.split(",")(2).toInt)).foreach(println)
+41643,2014-04-08 00:00:00.0,12435,PENDING
+61629,2013-12-21 00:00:00.0,12435,CANCELED
+5303,2013-08-26 00:00:00.0,12434,PENDING
+1868,2013-08-03 00:00:00.0,12434,CLOSED
+4799,2013-08-23 00:00:00.0,12434,PENDING_PAYMENT
+
+-- Here reverse ordering is done based on the 1st field, k String contains one record, fields split by comma's
+scala> rdd.takeOrdered(5)(Ordering[Int].reverse.on(k=> k.split(",")(0).toInt)).foreach(println)
+68883,2014-07-23 00:00:00.0,5533,COMPLETE
+68882,2014-07-22 00:00:00.0,10000,ON_HOLD
+68881,2014-07-19 00:00:00.0,2518,PENDING_PAYMENT
+68880,2014-07-13 00:00:00.0,1117,COMPLETE
+68879,2014-07-09 00:00:00.0,778,COMPLETE
