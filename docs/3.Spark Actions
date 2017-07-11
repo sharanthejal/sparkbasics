@@ -1,5 +1,30 @@
 
 #Spark Actions
+-- Data is stored in HDFS location when imported by sqoop as a text file, fields seperated by comma and lines seperated by new line.
+val path= "/user/hive/warehouse/retail_db"
+val rdd = sc.textFile(path + "/orders")
+
+-- reduce function takes two arguments and return one parameter of same type. First argument takes first element in the rdd/collection it applies and will be changed based on the return value.
+-- def reduce(f: (T, T) => T): T
+scala> rdd.reduce(
+     | (agg,ele)=> {
+	 if(agg.split(",")(2).toInt < ele.split(",")(2).toInt) agg else ele
+     | }
+	 |)
+
+	 
+-- top funtion will give the last 'n' number of records in the reverse order
+scala> rdd.top(3).foreach(println)
+9999,2013-09-25 00:00:00.0,1185,CLOSED
+9998,2013-09-25 00:00:00.0,9419,PENDING
+9997,2013-09-25 00:00:00.0,3471,PENDING_PAYMENT
+
+-- takeOrdered, Return the first n elements of the RDD using either their natural order or a custom comparator
+scala> rdd.takeOrdered(4)(Ordering[Int].reverse.on(k=> k.split(",")(0).toInt)).foreach(println)
+68883,2014-07-23 00:00:00.0,5533,COMPLETE
+68882,2014-07-22 00:00:00.0,10000,ON_HOLD
+68881,2014-07-19 00:00:00.0,2518,PENDING_PAYMENT
+68880,2014-07-13 00:00:00.0,1117,COMPLETE
 
 -- Return the first n elements of the RDD using either their natural order or a custom comparator.
 -- takeOrdered function, one can do reverse ordering and custom ordering of collections in spark
