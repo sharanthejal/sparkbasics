@@ -60,4 +60,5 @@ productsGroupByCategory.
   take(1).
   foreach(println)
   
+  productsGroupByCategory.sortByKey().flatMap(_._2.toList.sortBy(r => -r.split(",")(4).toFloat).take(5)).take(10).foreach(println)
   
