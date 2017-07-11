@@ -1,0 +1,46 @@
+#Spark distinct, union and intersect
+val a=List(1,2,3,4,5)
+val ardd= sc.parallelize(a)
+val b= List(2,3,5,6,7,8,8,9)
+b: List[Int] = List(2, 3, 5, 6, 7, 8, 8, 9)
+scala> val brdd= sc.parallelize(b)
+brdd: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[65] at parallelize at <console>:29
+
+-- union(otherDataset)
+-- It will return a new dataset which contains union of elements of source dataset and argument dataset
+scala> ardd.union(brdd).collect
+res41: Array[Int] = Array(1, 2, 3, 4, 5, 2, 3, 5, 6, 7, 8, 8, 9)
+
+-- intersection(otherDataset), only common elements will be returned
+-- Return a new RDD that contains the intersection of elements in the source dataset and the argument.
+
+scala> ardd.intersection(brdd).collect
+res43: Array[Int] = Array(2, 3, 5)
+
+-- distinct([numTasks]))
+-- Return a new dataset that contains the distinct elements of the source dataset.
+scala> brdd.distinct.collect
+res45: Array[Int] = Array(6, 8, 2, 3, 7, 9, 5)
+
+-- Get Union and Distinct elements
+scala> ardd.union(brdd).distinct.collect
+res46: Array[Int] = Array(4, 8, 1, 9, 5, 6, 2, 3, 7)
+
+-- We have order_items data set with six fields including order_item_product_id which is 3rd field
+-- Requirement: Let us see what are all the distinct order_item_product_id sold in a given month (December 2013))
+-- But month is not available in order_items. Hence we need to join with orders to get month
+
+val path= "/user/hive/warehouse/retail_db"
+val orders201312 = sc.textFile(path + "/orders").
+  filter(order => order.split(",")(1).contains("2013-12")).
+  map(order => (order.split(",")(0).toInt, order.split(",")(1)))
+  
+val orderItems = sc.textFile(path + "/order_items").
+  map(rec => (rec.split(",")(1).toInt, rec.split(",")(2).toInt))
+  
+val distinctProducts201312 = orders201312.
+  join(orderItems).map(rec=> rec._2._2).distinct
+
+scala> distinctProducts201312.count
+res52: Long = 99
+
