@@ -1,0 +1,5 @@
+#Spark sorting and Ranking
+#sortByKey and groupByKey
+-- Sort by status 4th field
+val path= "/user/hive/warehouse/retail_db"
+val orders= sc.textFile(path+"/orders").map(rec=> (rec.split(",")(3),rec)).sortByKey()
