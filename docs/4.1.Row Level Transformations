@@ -1,0 +1,38 @@
+#Spark Transformations
+#Row level transformations
+#Map and Flatmap
+--Data cleansing - removing special characters
+--Standardization – eg: phone number, we might want to get phone numbers from different sources and it might be represented different manner in different systems. When we get onto down stream systems we have to represent phone number in one standard format.
+It takes one record as input and returns exactly one record as output
+
+Also for vertical filtering, we use map function
+-- Above two can be achived in spark through map function. It takes one record as input and returns exactly one record as output.
+-- Find the completed ordered dates
+val path= "/user/hive/warehouse/retail_db"
+val rdd = sc.textFile(path + "/orders")
+val completedOrders= rdd.filter(order=> order.split(",")(3)=="COMPLETE")
+
+-- Find the orders and their dates which are completed.
+val orderDates = completedOrders.map(rec => (rec.split(",")(0).toInt, rec.split(",")(1)))
+
+
+--flatmap
+Unpivoting – flatMap. For each input record there will be 1 to n output records
+val lines = Array("Hello World", 
+  "In this case we are trying to understand", 
+  "the purpose of flatMap", 
+  "flatMap is a function which will apply transformation", 
+  "if the transformation results in array, it will flatten out array as individual records", 
+  "let us also understand difference between map and flatMap", 
+  "in case of map, it take one record and return one record after applying transformation", 
+  "even if the transformation result in an array", 
+  "where as in case of flatMap, it might return one or more records", 
+  "if the transformation of 1 record result an array of 1000 records, ", 
+  "then flatMap returns 1000 records")
+  
+val linesRDD = sc.parallelize(lines)
+linesRDD.map(rec=> rec.split(" ")).count
+11
+linesRDD.flatMap(rec=> rec.split(" ")).count
+98
+linesRDD.map(rec=> rec.split(" ")).collect.foreach(println)
