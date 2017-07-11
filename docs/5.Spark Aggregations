@@ -1,0 +1,27 @@
+#Spark Aggregations – reduceByKey and aggregateByKey
+-- reduce can be used for total aggregations.
+reduceByKey -- uses combiner
+aggregateByKey --uses combiner
+groupByKey  -doesn't use combiner
+
+We will use order_items. It has six fields
+order_item_id
+order_item_order_id
+order_item_product_id
+order_item_quantity
+order_item_subtotal
+order_item_product_price
+
+-- Requirement: let us compute revenue for each order. We have to group by order_item_order_id and get the revenue for each order. We should use reduceByKey as it is simple to implement.
+
+val path= "/user/hive/warehouse/retail_db"
+val rdd = sc.textFile(path + "/order_items")
+val orderItems= rdd.map(oi=> (oi.split(",")(1).toInt, oi.split(",")(4).toFloat))
+
+-- Compute revenue for each order
+orderItems.reduceByKey((total, orderItemSubtotal)=> total+orderItemSubtotal).take(100).foreach(println)
+
+-- For getting the revenue for the OrderItem 4, use filter for this as below
+scala> orderItems.reduceByKey((total, orderItemSubtotal)=> total+orderItemSubtotal).filter(oi=> oi._1==4).collect().foreach(println)
+(4,699.85004)
+
