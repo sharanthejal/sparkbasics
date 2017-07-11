@@ -19,3 +19,54 @@ scala> rdd.count
 res13: Long = 68883
 
 -- Out of 68883 orders 22899 orders are completed ones.
+
+scala> compltedOrders.take(3).foreach(println)
+3,2013-07-25 00:00:00.0,12111,COMPLETE
+5,2013-07-25 00:00:00.0,11318,COMPLETE
+6,2013-07-25 00:00:00.0,7130,COMPLETE
+
+-- Requirement: Find the pending or processing orders from the orders text file
+val pendingOrders= rdd.filter(order=> order.split(",")(3)!="COMPLETE")
+
+-- Here if we observe we are getting closed records also which we don't want, so above filter query needs to be changed.
+pendingOrders.take(10).foreach(println)
+scala> pendingOrders.take(10).foreach(println)
+1,2013-07-25 00:00:00.0,11599,CLOSED
+2,2013-07-25 00:00:00.0,256,PENDING_PAYMENT
+4,2013-07-25 00:00:00.0,8827,CLOSED
+8,2013-07-25 00:00:00.0,2911,PROCESSING
+9,2013-07-25 00:00:00.0,5657,PENDING_PAYMENT
+10,2013-07-25 00:00:00.0,5648,PENDING_PAYMENT
+11,2013-07-25 00:00:00.0,918,PAYMENT_REVIEW
+12,2013-07-25 00:00:00.0,1837,CLOSED
+13,2013-07-25 00:00:00.0,9149,PENDING_PAYMENT
+14,2013-07-25 00:00:00.0,9842,PROCESSING
+
+-- Below filter function is giving the proper result for the requirement
+val pendingOrders= rdd.filter(order=> order.split(",")(3).contains("PENDING") || order.split(",")(3)=="PROCESSING")
+scala> pendingOrders.take(10).foreach(println)
+2,2013-07-25 00:00:00.0,256,PENDING_PAYMENT
+8,2013-07-25 00:00:00.0,2911,PROCESSING
+9,2013-07-25 00:00:00.0,5657,PENDING_PAYMENT
+10,2013-07-25 00:00:00.0,5648,PENDING_PAYMENT
+13,2013-07-25 00:00:00.0,9149,PENDING_PAYMENT
+14,2013-07-25 00:00:00.0,9842,PROCESSING
+16,2013-07-25 00:00:00.0,7276,PENDING_PAYMENT
+19,2013-07-25 00:00:00.0,9488,PENDING_PAYMENT
+20,2013-07-25 00:00:00.0,9198,PROCESSING
+21,2013-07-25 00:00:00.0,2711,PENDING
+
+-- Requirement: Find the pending or processing orders from the orders text file which are from 2013-08(2013 August)
+-- Here paranthesis need to be kept for the right side where || and && are available to avoid conflict
+val pendingOrdersAug= rdd.filter(order => (order.split(",")(3).contains("PENDING") || order.split(",")(3)=="PROCESSING") && order.split(",")(1).contains("2013-08"))
+scala> pendingOrdersAug.take(10).foreach(println)
+1300,2013-08-01 00:00:00.0,553,PENDING_PAYMENT
+1301,2013-08-01 00:00:00.0,1604,PENDING_PAYMENT
+1303,2013-08-01 00:00:00.0,7018,PROCESSING
+1306,2013-08-01 00:00:00.0,11672,PENDING_PAYMENT
+1308,2013-08-01 00:00:00.0,11645,PENDING
+1310,2013-08-01 00:00:00.0,5602,PENDING
+1311,2013-08-01 00:00:00.0,5396,PENDING_PAYMENT
+1316,2013-08-01 00:00:00.0,6376,PENDING_PAYMENT
+1317,2013-08-01 00:00:00.0,5467,PENDING
+1325,2013-08-01 00:00:00.0,10425,PENDING
