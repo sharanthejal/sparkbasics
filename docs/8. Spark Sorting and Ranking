@@ -1,5 +1,27 @@
 #Spark sorting and Ranking
 #sortByKey and groupByKey
--- Sort by status 4th field
+
+-- sortByKey([ascending], [numTasks])
+-- When called on a dataset of (K, V) pairs where K implements Ordered, returns a dataset of (K, V) pairs sorted by keys in ascending or descending order, as specified in the boolean ascending argument.
+
+-- Requirement: Let us get the details of orders sorted by order_status
+-- order_status presents at fourth position in orders 
+
 val path= "/user/hive/warehouse/retail_db"
+-- Ascending order by default
 val orders= sc.textFile(path+"/orders").map(rec=> (rec.split(",")(3),rec)).sortByKey()
+val orders= sc.textFile(path+"/orders").map(rec=> (rec.split(",")(3),rec)).sortByKey(true)
+
+-- Descending Order as false is provided as argument in sortByKey function
+val orders= sc.textFile(path+"/orders").map(rec=> (rec.split(",")(3),rec)).sortByKey(false)
+orders.collect.foreach(println)
+
+-- Requirement: orders sorted by status and date in descending order
+val orders= sc.textFile(path+"/orders").map(rec=> ((rec.split(",")(3),rec.split(",")(1)),rec)).sortByKey(false)
+scala> orders.first
+res3: ((String, String), String) = ((SUSPECTED_FRAUD,2014-07-24 00:00:00.0),57621,2014-07-24 00:00:00.0,6230,SUSPECTED_FRAUD)
+
+-- It will take the second field which is nothing but orders 
+orders.map(_._2).collect.foreach(println)
+
+orders.filter(e=> e.).collect.foreach(println)
