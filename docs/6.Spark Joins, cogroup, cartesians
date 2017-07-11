@@ -1,0 +1,73 @@
+#Spark Joining datasets, join, cogroup, cartesian
+-- There are mainly four types of datasets available in spark
+join or innerjoin
+rightOuterJoin
+leftOuterJoin
+fullOuterJoin
+
+-- Join is also a type of transformation function which performs join operation with other dataset.
+-- join(otherDataset, [numTasks])
+-- When called on datasets of type (K, V) and (K, W), returns a dataset of (K, (V, W)) pairs with all pairs of elements for each key. Outer joins are supported through leftOuterJoin, rightOuterJoin, and fullOuterJoin.
+
+Example:
+-- orders and order_items are transactional tables
+-- orders have one entry for each order, but there can be many items in each order, means many orderItems.
+
+val path= "/user/hive/warehouse/retail_db"
+val orders = sc.textFile(path + "/orders").map(rec=> (rec.split(",")(0).toInt,rec))
+val orderItems = sc.textFile(path + "/order_items").map(rec=> (rec.split(",")(1).toInt,rec))
+
+-- Find the distinct orders in the orderItems RDD 
+scala> orderItems.count
+res24: Long = 172198
+
+scala> orders.count
+res25: Long = 68883
+
+scala> orderItems.map(_._1).distinct.count
+res28: Long = 57431
+
+--Inner Join
+val ordersJoin= orders.join(orderItems)
+scala> ordersJoin.first
+res29: (Int, (String, String)) = (18624,(18624,2013-11-17 00:00:00.0,9762,CLOSED,46544,18624,1073,1,199.99,199.99))
+ordersJoin.take(10).foreach(println)
+
+--LeftOuterJoin
+val ordersLeftOuter= orders.leftOuterJoin(orderItems)
+scala> ordersLeftOuter.count
+res31: Long = 183650
+-- Will be getting Some() for the existing data and None for the null data
+scala> ordersLeftOuter.take(10).foreach(println)
+(57436,(57436,2014-07-22 00:00:00.0,1798,PENDING_PAYMENT,Some(143677,57436,917,5,109.95,21.99)))
+(57436,(57436,2014-07-22 00:00:00.0,1798,PENDING_PAYMENT,Some(143678,57436,502,5,250.0,50.0)))
+(57436,(57436,2014-07-22 00:00:00.0,1798,PENDING_PAYMENT,Some(143679,57436,1004,1,399.98,399.98)))
+(57436,(57436,2014-07-22 00:00:00.0,1798,PENDING_PAYMENT,Some(143680,57436,1004,1,399.98,399.98)))
+(57436,(57436,2014-07-22 00:00:00.0,1798,PENDING_PAYMENT,Some(143681,57436,1014,3,149.94,49.98)))
+(18624,(18624,2013-11-17 00:00:00.0,9762,CLOSED,Some(46544,18624,1073,1,199.99,199.99)))
+(32196,(32196,2014-02-09 00:00:00.0,3844,PENDING,None))
+(54040,(54040,2014-07-01 00:00:00.0,4705,PROCESSING,Some(135108,54040,1014,5,249.9,49.98)))
+(54040,(54040,2014-07-01 00:00:00.0,4705,PROCESSING,Some(135109,54040,957,1,299.98,299.98)))
+(54040,(54040,2014-07-01 00:00:00.0,4705,PROCESSING,Some(135110,54040,191,5,499.95,99.99)))
+
+-- Now get the orders for which orderItems are None or null
+scala> ordersLeftOuter.filter(rec=> rec._2._2==None).count
+res33: Long = 11452
+
+--RightOuterJoin is similar to LeftOuterJoin where the all the right dataset records will be present
+val ordersRightOuter= orders.rightOuterJoin(orderItems)
+scala> ordersRightOuter.filter(rec=> rec._2._2==None).count
+res34: Long = 0
+
+-- cogroup(otherDataset, [numTasks])
+-- When called on datasets of type (K, V) and (K, W), returns a dataset of (K, (Iterable<V>, Iterable<W>)) tuples. This operation is also called groupWith.
+
+val ordersCogroup = orders.cogroup(orderItems)
+ordersCogroup.take(10).foreach(println)
+
+-- cartesian(otherDataset) 
+-- When called on datasets of types T and U, returns a dataset of (T, U) pairs (all pairs of elements).
+-- Getting empty results for the below data don't know the reason
+val a = sc.parallelize(List(1, 2, 3, 4))
+val b = sc.parallelize(List("Hello", "World"))
+a.cartesian(b).foreach(println)
