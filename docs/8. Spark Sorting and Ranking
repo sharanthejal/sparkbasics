@@ -26,7 +26,10 @@ orders.map(_._2).collect.foreach(println)
 
 orders.filter(e=> e.).collect.foreach(println)
 
-
+-- groupByKey([numTasks])
+When called on a dataset of (K, V) pairs, returns a dataset of (K, Iterable<V>) pairs. 
+Note: If you are grouping in order to perform an aggregation (such as a sum or average) over each key, using reduceByKey or aggregateByKey will yield much better performance. 
+Note: By default, the level of parallelism in the output depends on the number of partitions of the parent RDD. You can pass an optional numTasks argument to set a different number of tasks.
 
 -- let us get top 5 products in each category from products
 val products = sc.textFile(path + "/products")
