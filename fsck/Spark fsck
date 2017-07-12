@@ -1,0 +1,9 @@
+#Intersting Stuff
+fsck (for "file system consistency check") is a tool for checking the consistency of a file system in Unix and Unix-like operating systems, such as Linux and macOS. A similar command, CHKDSK exists in Microsoft Windows.
+
+sudo -uhdfs hadoop -fsck <path> -files -blocks
+
+sudo -uhdfs hadoop fsck /user/test/output/wordcount/ -files -blocks
+
+-- files Print out files being checked.
+-- blocks Print out block report.
