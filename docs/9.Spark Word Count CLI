@@ -1,0 +1,31 @@
+#Spark wordcount
+val inputpath="/user/test/input"
+val outputpath="/user/test/output/wordcount"
+val rdd= sc.textFile(inputpath+"/wordcount.txt")
+
+-- To count the words by key
+val count= rdd.flatMap(word=> (word.split(" "))).map(k=> (k,1)).
+reduceByKey((total,element)=> total+element ).collect.foreach(println)
+
+-- To count total number of words present in the text file
+val count= rdd.flatMap(word=> (word.split(" "))).map(k=> (1,1)).
+reduceByKey((total,element)=> total+element ).collect.foreach(println)
+
+
+-- saving to text file
+val count= rdd.flatMap(word=> (word.split(" "))).map(k=> (k,1)).
+reduceByKey((total,element)=> total+element ).saveAsTextFile(outputpath)
+-- Sample output stored
+(producing,1)
+(connector,1)
+(streams,1)
+(the,2)
+
+-- Saving to file only but different format
+val count= rdd.flatMap(word=> (word.split(" "))).map(k=> (k,1)).
+reduceByKey((total,element)=> total+element ).map(k=> k._1 + "\t" + k._2).saveAsTextFile(outputpath)
+
+-- Check the output
+sudo -uhdfs hadoop fs -cat /user/test/output/wordcount/part-*
+sudo -uhdfs hadoop fs -ls /user/test/output/wordcount/
+sudo -uhdfs hadoop fs -rm -r /user/test/output/wordcount
