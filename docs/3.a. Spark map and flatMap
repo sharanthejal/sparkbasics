@@ -1,0 +1,37 @@
+#map and flatMap functions
+
+scala> val a= (1 to 10).toList
+a: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+scala> val b= (11 to 20).toList
+b: List[Int] = List(11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+
+
+scala> val c= List((1,a),(2,b))
+c: List[(Int, List[Int])] = List((1,List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)), (2,List(11, 12, 13, 14, 15, 16, 17, 18, 19, 20)))
+
+scala> c.map(rec=> rec._2).foreach(println)
+List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+List(11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+
+scala> c.flatMap(rec=> rec._2).foreach(println)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
