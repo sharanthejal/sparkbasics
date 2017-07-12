@@ -1,7 +1,18 @@
 #Spark Aggregations – reduceByKey and aggregateByKey
 -- reduce can be used for total aggregations.
-reduceByKey -- uses combiner
-aggregateByKey --uses combiner
+--reduceByKey (uses combiner)
+-- reduceByKey(func, [numTasks])
+When called on a dataset of (K, V) pairs, returns a dataset of (K, V) pairs where the values for each key are aggregated 
+using the given reduce function func, which must be of type (V,V) => V. 
+Like in groupByKey, the number of reduce tasks is configurable through an optional second argument.
+
+-- aggregateByKey (uses combiner)
+-- aggregateByKey(zeroValue)(seqOp, combOp, [numTasks])
+When called on a dataset of (K, V) pairs, returns a dataset of (K, U) pairs where the values for each key are aggregated
+using the given combine functions and a neutral "zero" value.
+Allows an aggregated value type that is different than the input value type, while avoiding unnecessary allocations. 
+Like in groupByKey, the number of reduce tasks is configurable through an optional second argument.
+
 groupByKey  -doesn't use combiner
 
 We will use order_items. It has six fields
