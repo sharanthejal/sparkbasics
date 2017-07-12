@@ -1,0 +1,64 @@
+#groupByKey DenseRanking
+val path= "/user/hive/warehouse/retail_db"
+val products = sc.textFile(path + "/products")
+val productsGroupByCategory = products.
+  filter(product => product.split(",")(4) != "").
+  map(product => {
+    val p = product.split(",")
+    (p(1).toInt, product)
+  }).
+groupByKey
+-- takeWhile is more efficient than filter in some usecases
+-- It will work as below where filter iterate the whole collection, takeWhile loops until condition fails
+scala> val n=(1 to 100)
+scala> n.filter(x=> x%2==0)
+res21: scala.collection.immutable.IndexedSeq[Int] = Vector(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100)
+scala> n.takeWhile(x=> x%2==0)
+res22: scala.collection.immutable.Range = Range()
+scala> n.takeWhile(x=> x%2==1)
+res23: scala.collection.immutable.Range = Range(1)
+
+
+-- Exploring scala APIs to get top 5 priced products
+val i = productsGroupByCategory.first._2
+val l = i.toList
+
+val topNPrices = l.map(rec => rec.split(",")(4).toFloat).
+  sortBy(k => -k).
+  distinct.
+  take(5)
+
+l.sortBy(rec => -rec.split(",")(4).toFloat).
+  filter(rec => topNPrices.contains(rec.split(",")(4).toFloat)).
+  foreach(println)
+  
+l.sortBy(rec => -rec.split(",")(4).toFloat).
+  takeWhile(rec => topNPrices.contains(rec.split(",")(4).toFloat)).
+  foreach(println)
+
+-- Getting top 5 priced products using Spark and Scala
+productsGroupByCategory.flatMap(rec => {
+  val topNPrices = rec._2.toList.
+    map(rec => rec.split(",")(4).toFloat).
+    sortBy(k => -k).
+    distinct.
+    take(5)
+  rec._2.toList.
+    sortBy(rec => -rec.split(",")(4).toFloat).
+    takeWhile(rec => topNPrices.contains(rec.split(",")(4).toFloat))
+}).
+collect.
+foreach(println)
+
+productsGroupByCategory.flatMap(rec => {
+  val topNPrices = rec._2.toList.
+    map(rec => rec.split(",")(4).toFloat).
+    sortBy(k => -k).
+    distinct.
+    take(5)
+  rec._2.toList.
+    sortBy(rec => -rec.split(",")(4).toFloat).
+    filter(rec => topNPrices.contains(rec.split(",")(4).toFloat))
+}).
+collect.
+foreach(println)
