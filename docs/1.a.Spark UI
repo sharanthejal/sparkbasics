@@ -1,0 +1,8 @@
+#cloudera spark ui default values
+
+spark.history.ui.port 18088
+
+--API Name
+istory_server_web_port
+
+Normally the UI port is 4040 but in cloudera it's 18080
