@@ -1,0 +1,46 @@
+#Kafka Installation
+1. Download binary distribution of kafka from the official website
+
+-- Go to the home directoy where kafka is unzipped
+-- Start the zookeeper with the default config
+./bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
+
+-- Got the exception as below, Java not found. So java is a pre-requisite to start zookeeper.
+/home/ubuntu/kafka/kafka_2.11-0.11.0.0/bin/kafka-run-class.sh: line 258: exec: java: not found
+
+-- install java 
+sudo apt-get update
+sudo apt-get install default-jdk
+
+-- Now run the zookeeper again, for testing don't run it as daemon for this time
+./bin/zookeeper-server-start.sh config/zookeeper.properties
+./bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
+-- Will see below kind of message as last line
+[2017-07-13 11:58:22,126] INFO binding to port 0.0.0.0/0.0.0.0:2181 (org.apache.zookeeper.server.NIOServerCnxnFactory)
+
+
+# start kafka broker
+./bin/kafka-server-start.sh  config/server.properties
+./bin/kafka-server-start.sh -daemon config/server.properties
+-- Will see below kind of message as last line, where it will show kafka server started. Then type ctrl+z and then type bg. So that it will run in background process as daemon.
+[2017-07-13 12:03:05,563] INFO [Kafka Server 0], started (kafka.server.KafkaServer)
+
+#Create Topic
+./bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic MyFirtKafkaTopic --partitions 2 --replication-factor 1
+-- Look for the below message in the logs, it will be there some where in the middle of the logs
+Created topic "MyFirtKafkaTopic".
+
+#Kafka Producer
+-- We will now send couple of sample messages to this newly created topic using Kafka console producer utility.
+-- type your message and press enter
+./bin/kafka-console-producer.sh --broker-list localhost:9092 --topic MyFirtKafkaTopic
+
+
+
+#Kafka Consumer
+-- Next step is to consume these mesasges from Kafka console consumer utility using below command. Message that we sent using producer will be printed on console after successful execution of command.
+-- In the below bootstrap-server is like broker-list in producer, from-beginning to get the messages from the beginning
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic MyFirtKafkaTopic --from-beginning
+
+#Describe Topic
+./bin/kafka-topics.sh --zookeeper localhost:2181 --describe --topic MyFirtKafkaTopic
