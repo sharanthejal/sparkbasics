@@ -1,0 +1,23 @@
+#Cloudera Kafka
+-- First start a broker in Kafka by starting the service, no need to start the broker explicitly as we did normally for cloudera
+-- create a topic in kafka
+-- Java Heap Size(broker_max_heap_size) of Broker was 50MB which created problem in starting/installing brokers which are changed to 256MB. Now workng fine.
+kafka-topics --zookeeper localhost:2181 --create --topic myfirstkafkatopic --partitions 2  --replication-factor 1
+
+kafka-topics --zookeeper localhost:2181 --list
+
+kafka-topics --zookeeper localhost:2181 --describe myfirstkafkatopic
+Topic:myfirstkafkatopic PartitionCount:2        ReplicationFactor:1     Configs:
+        Topic: myfirstkafkatopic        Partition: 0    Leader: 92      Replicas: 92    Isr: 92
+        Topic: myfirstkafkatopic        Partition: 1    Leader: 92      Replicas: 92    Isr: 92
+
+-- Getting the below error when trying to run the below command as only one broker is available but trying to keep replication factor 3
+kafka-topics --zookeeper localhost:2181 --create --topic myfirstkafkatopic --partitions 2  --replication-factor 3
+Error while executing topic command : replication factor: 3 larger than available brokers: 1
+[2017-07-17 10:02:47,495] ERROR org.apache.kafka.common.errors.InvalidReplicationFactorException: replication factor: 3 larger than available brokers: 1
+
+kafka-topics --zookeeper localhost:2181 --create --topic myclusterkafkatopic --partitions 2  --replication-factor 3
+
+Topic:myclustertkafkatopic      PartitionCount:2        ReplicationFactor:3     Configs:
+        Topic: myclustertkafkatopic     Partition: 0    Leader: 93      Replicas: 93,92,94      Isr: 93,92,94
+        Topic: myclustertkafkatopic     Partition: 1    Leader: 94      Replicas: 94,93,92      Isr: 94,93,92
