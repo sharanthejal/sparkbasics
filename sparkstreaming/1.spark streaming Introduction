@@ -1,0 +1,98 @@
+#Spark Streaming
+-- Start Spark Shell
+sudo -uhdfs spark-shell \
+	--master yarn \
+    --deploy-mode client \
+    --driver-memory 512m \
+    --executor-memory 256m \
+    --executor-cores 2 
+
+#Failed because of giving less driver-memory, So give more driver memory. Because all the data will be collected over there.
+#And refer some tuning blogs which helps in configuring better spark jobs 
+#Reference:https://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/
+sudo -uhdfs spark-shell \
+	--master yarn \
+    --deploy-mode client \
+    --driver-memory 512m \
+    --executor-memory 256m \
+	--executor-cores 1
+
+#More parameters, yet to try
+sudo -uhdfs spark-shell \
+	--master yarn \
+    --deploy-mode client \
+    --driver-memory 512m \
+    --executor-memory 256m \
+	--num-executors 2 \
+	--executor-cores 1
+
+#Kill spark Applications
+yarn application -kill application_1496830542298_0142	
+
+# Inside spark shell to use spark streaming context first stop spark context.
+sc.stop
+-- the above statement will stop the sparkcontext and also the application running in yarn
+import org.apache.spark.SparkConf
+import org.apache.spark.streaming.StreamingContext
+val conf = new SparkConf().setAppName("Spark Streaming")
+val ssc= new StreamingContext(conf, org.apache.spark.streaming.Seconds(15))
+val lines= ssc.socketTextStream("localhost",44444)
+lines.print()
+val words = lines.flatMap(_.split(" "))
+val pairs = words.map(word => (word, 1))
+val wordCounts = pairs.reduceByKey(_ + _)
+wordCounts.print()
+
+#val lines= ssc.socketTextStream("ipaddress",44444)
+#lines.print
+
+-- Start netcat at the IP specified above, then stat the sss.start. Otherwise it will through an error as below
+-- 17/07/18 07:09:54 ERROR streaming.StreamingContext: Error starting the context, marking it as stopped
+-- java.lang.IllegalArgumentException: requirement failed: No output operations registered, so nothing to execute
+
+ netcat -l -p 44444
+
+#come back to spark shell, 
+ssc.start()
+
+--
+output:
+scala> ssc.start()
+17/07/18 10:34:26 WARN streaming.StreamingContext: Dynamic Allocation is enabled for this application. 
+Enabling Dynamic allocation for Spark Streaming applications can cause data loss if 
+Write Ahead Log is not enabled for non-replayable sources like Flume. See the programming guide for details on how to enable the Write Ahead Log
+
+scala> -------------------------------------------
+Time: 1500374085000 ms
+-------------------------------------------
+hello, hope this time it will work
+
+-------------------------------------------
+Time: 1500374100000 ms
+-------------------------------------------
+now let us see
+whether it will work or not
+
+-------------------------------------------
+Time: 1500374115000 ms
+-------------------------------------------
+hope it will work
+
+-------------------------------------------
+Time: 1500374130000 ms
+-------------------------------------------
+yes it's working fine
+
+-------------------------------------------
+Time: 1500374145000 ms
+-------------------------------------------
+with out any issues this time
+wow
+-------------------------------------------
+Time: 1500374160000 ms
+-------------------------------------------
+
+-------------------------------------------
+
+#Stop the spark streaming context
+ssc.stop(true,true)
