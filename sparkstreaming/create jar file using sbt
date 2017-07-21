@@ -1,0 +1,6 @@
+#Create Jar File Using SBT
+-- Create a WordCount application in scala Object using IntelliJ
+-- Go to the project directory location
+-- Run sbt package
+-- It will give the output jar file
+
