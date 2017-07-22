@@ -1,0 +1,23 @@
+#Spark Streaming + Flume integration guide
+#Ref: https://spark.apache.org/docs/latest/streaming-flume-integration.html
+-- There are two approaches avaialble currently as shown in the documentation, push-based approach and pull based approach.
+-- Pull based approach is more reliable and gurantees fault tolerance.
+-- Instead of Flume pushing data directly to Spark Streaming, this approach runs a custom Flume sink that allows the following.
+-- Flume pushes data into the sink, and the data stays buffered.
+-- Spark Streaming uses a reliable Flume receiver and transactions to pull data from the sink. Transactions succeed only after data is received and replicated by Spark Streaming. This ensures stronger reliability and fault-tolerance guarantees than the previous approach.
+--  A reliable receiver correctly sends acknowledgment to a reliable source when the data has been received and stored in Spark with replication.
+
+-- For example in the below log string "/department/golf/categories HTTP/1.1" will be 6th String counts from 0 when splits by space(" ")
+-- Then Split the above string by '/', the 2nd element is the category. i.e golf.
+-- Use case is counting the department count in a time interval i.e how many times a department is visited in a certain time. 
+172.230.132.165 - - [18/Jul/2017:06:19:30 -0800] "GET /department/golf/categories HTTP/1.1" 200 857 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36"
+
+#First start Flume Agent with Proper configuration file
+sudo -u hdfs flume-ng agent --name fmpspark --conf-file /home/ubuntu/sharan/flume/fmpspark.conf
+
+
+#Now run the spark streaming application which does the department count from the logs
+sudo -uhdfs spark-submit --class SparkDepartmentCountFlume \
+    --master yarn \
+    --deploy-mode client \
+	spark-streaming-basics-home_2.10-1.0.jar
