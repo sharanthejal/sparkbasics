@@ -21,3 +21,17 @@ sudo -uhdfs spark-submit --class SparkDepartmentCountFlume \
     --master yarn \
     --deploy-mode client \
 	spark-streaming-basics-home_2.10-1.0.jar
+	
+	
+-- Below is the output getting from spark-streaming and in HDFS for now pushing all the events for the interval
+-- It will start Avro server for spark sink
+Sample output:
+-------------------------------------------
+Time: 1500739440000 ms
+-------------------------------------------
+(fan%20shop,1)
+(golf,1)
+(footwear,1)
+(team%20sports,3)
+(outdoors,1)
+(apparel,2)
