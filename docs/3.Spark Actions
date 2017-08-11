@@ -7,6 +7,7 @@ val rdd = sc.textFile(path + "/orders")
 -- reduce function takes two arguments and return one parameter of same type. First argument takes first element in the rdd/collection
 -- it applies and will be changed based on the return value.
 -- def reduce(f: (T, T) => T): T
+-- Reference: http://backtobazics.com/big-data/spark/apache-spark-reduce-example/
 scala> rdd.reduce(
      | (agg,ele)=> {
 	 if(agg.split(",")(2).toInt < ele.split(",")(2).toInt) agg else ele
