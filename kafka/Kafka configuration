@@ -1,0 +1,45 @@
+# fmpkafka.conf: A single-node Flume configuration
+
+# Name the components on this agent
+fmpkafka.sources = logsource
+fmpkafka.sinks = kafkasink hdfssink
+fmpkafka.channels = kafkachannel hdfschannel
+
+# Describe/configure the source
+fmpkafka.sources.logsource.type = exec
+fmpkafka.sources.logsource.command = tail -f /home/ubuntu/sharan/flume/gen_logs/logs/access.log
+
+# Describe the kafka sink
+fmpkafka.sinks.kafkasink.type = org.apache.flume.sink.kafka.KafkaSink
+#bootstrap servers
+fmpkafka.sinks.kafkasink.kafka.bootstrap.servers = ip1:9092,ip2:9092,ip3:9092
+fmpkafka.sinks.kafkasink.kafka.topic = myclustertkafkatopic
+
+# Describe the HDFS sink
+# See different parameters like rollsie, rollcount and roll Interval and fileSuffix
+# To use the date parameters have to use the useLocalTimeStamp is true
+fmpkafka.sinks.hdfssink.type = hdfs
+fmpkafka.sinks.hdfssink.hdfs.path = /user/flumetest/flumeexample_%Y-%m-%d
+fmpkafka.sinks.hdfssink.hdfs.fileType = DataStream
+fmpkafka.sinks.hdfssink.hdfs.filePrefix = retail
+fmpkafka.sinks.hdfssink.hdfs.fileSuffix = .txt
+fmpkafka.sinks.hdfssink.hdfs.rollSize = 1048576
+fmpkafka.sinks.hdfssink.hdfs.rollCount = 30
+fmpkafka.sinks.hdfssink.hdfs.rollInterval = 60
+fmpkafka.sinks.hdfssink.hdfs.inUseSuffix = .tmp
+fmpkafka.sinks.hdfssink.hdfs.useLocalTimeStamp = true
+
+# Use a channel which buffers events in memory kafkasink
+fmpkafka.channels.kafkachannel.type = memory
+fmp.channels.kafkachannel.capacity = 1000
+fmp.channels.kafkachannel.transactionCapacity = 100
+
+# Use a channel which buffers events in file for hdfssink
+fmpkafka.channels.hdfschannel.type = file
+fmpkafka.channels.hdfschannel.capacity = 1000
+fmpkafka.channels.hdfschannel.transactionCapacity = 100
+
+# Bind the source and sink to the channel
+fmpkafka.sources.logsource.channels = kafkachannel hdfschannel
+fmpkafka.sinks.kafkasink.channel = kafkachannel
+fmpkafka.sinks.hdfssink.channel = hdfschannel
