@@ -1,4 +1,7 @@
 #Kafka Installation
+#For Windows follow the dzone tutorial
+https://dzone.com/articles/running-apache-kafka-on-windows-os
+
 1. Download binary distribution of kafka from the official website
 
 -- Go to the home directoy where kafka is unzipped
