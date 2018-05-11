@@ -1,0 +1,28 @@
+#Running Kafka on Windows
+https://dzone.com/articles/running-apache-kafka-on-windows-os
+1.Start Zookeeper 3.4.6
+	zkserver
+2.Start Kafka Server first
+  Go to cd C:\Softwares\kafka_2.11-0.10.1.1
+  .\bin\windows\kafka-server-start.bat .\config\server.properties
+
+3. Create Kafka topics
+	Go to cd C:\Softwares\kafka_2.11-0.10.1.1\bin\windows
+	kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test
+	Created topic "test".
+
+
+4. Start Producer
+	Go to cd C:\Softwares\kafka_2.11-0.10.1.1\bin\windows
+	kafka-console-producer.bat --broker-list localhost:9092 --topic test
+	kafka-console-producer.bat --broker-list localhost:9092 --topic gstr1-rulesOnRawData
+	kafka-console-producer.bat --broker-list localhost:9092 --topic gstr2-rulesonRawData
+	
+	
+5. Start Consumer
+	kafka-console-consumer.bat --zookeeper localhost:2181 --topic test
+	kafka-console-consumer.bat --zookeeper localhost:2181 --topic gstr1-rulesOnRawData
+
+6.Describe Topic
+Go to cd C:\Softwares\kafka_2.11-0.10.1.1\bin\windows
+	kafka-topics.bat --zookeeper localhost:2181 --describe --topic gstr1-rulesOnRawData
